@@ -4,7 +4,7 @@ const app = express()
 const mongoose = require('mongoose') // 載入 mongoose
 mongoose.connect('mongodb://localhost/todo-list', { useNewUrlParser: true, useUnifiedTopology: true }) // 設定連線到 mongoDB
 const exphbs = require('express-handlebars');
-const Todo = require('./models/todo') // 載入 Todo model
+const Todo = require('./models/todo.js') // 載入 Todo model
 const bodyParser = require('body-parser')
 
 // 取得資料庫連線狀態
@@ -38,6 +38,14 @@ app.post('/todos', (req, res) => {
   const name = req.body.name       // 從 req.body 拿出表單裡的 name 資料
   return Todo.create({ name })     // 存入資料庫
     .then(() => res.redirect('/')) // 新增完成後導回首頁
+    .catch(error => console.log(error))
+})
+
+app.get('/todos/:id', (req, res) => {
+  const id = req.params.id
+  return Todo.findById(id)
+    .lean()
+    .then((todo) => res.render('detail', { todo }))
     .catch(error => console.log(error))
 })
 
