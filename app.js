@@ -6,6 +6,7 @@ mongoose.connect('mongodb://localhost/todo-list', { useNewUrlParser: true, useUn
 const exphbs = require('express-handlebars');
 const Todo = require('./models/todo.js') // 載入 Todo model
 const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 
 // 取得資料庫連線狀態
 const db = mongoose.connection
@@ -21,6 +22,7 @@ db.once('open', () => {
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(methodOverride('_method'))
 
 // 設定首頁路由
 app.get('/', (req, res) => {
@@ -58,7 +60,7 @@ app.get('/todos/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-app.post('/todos/:id/edit', (req, res) => {
+app.put('/todos/:id', (req, res) => {
   const id = req.params.id
   const { name, isDone } = req.body
   return Todo.findById(id)
@@ -71,7 +73,7 @@ app.post('/todos/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-app.post('/todos/:id/delete', (req, res) => {
+app.delete('/todos/:id', (req, res) => {
   const id = req.params.id
   return Todo.findById(id)
     .then(todo => todo.remove())
